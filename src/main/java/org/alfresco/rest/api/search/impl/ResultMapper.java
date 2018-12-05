@@ -44,6 +44,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.alfresco.repo.search.impl.lucene.LuceneResultSet;
+import org.alfresco.repo.search.impl.lucene.PagingLuceneResultSet;
 import org.alfresco.repo.search.impl.lucene.SolrJSONResultSet;
 import org.alfresco.repo.search.impl.solr.facet.facetsresponse.GenericBucket;
 import org.alfresco.repo.search.impl.solr.facet.facetsresponse.GenericFacetResponse;
@@ -199,16 +201,33 @@ public class ResultMapper
         }
         else
         {
+
+            PagingLuceneResultSet luceneResultSet = findPagingLuceneResultSet(results);
             //This probably wasn't solr
-            if (!results.hasMore())
+
+            if (luceneResultSet != null)
             {
-                //If there are no more results then we are confident that the number found is correct
-                //otherwise we are not confident enough that its accurate
-                total = setTotal(results);
+                total = setTotal(luceneResultSet);
+            }
+            else
+            {
+                if (!results.hasMore())
+                {
+                    //If there are no more results then we are confident that the number found is correct
+                    //otherwise we are not confident enough that its accurate
+                    total = setTotal(results);
+                }
             }
         }
 
         return CollectionWithPagingInfo.asPaged(params.getPaging(), noderesults, results.hasMore(), total, null, context);
+    }
+
+    private PagingLuceneResultSet findPagingLuceneResultSet(ResultSet results) {
+        if (results instanceof PagingLuceneResultSet){
+            return (PagingLuceneResultSet) results;
+        }
+        return null;
     }
 
     /**
@@ -635,6 +654,8 @@ public class ResultMapper
     {
         ResultSet theResultSet = results;
 
+
+        //dead code
         if (results instanceof FilteringResultSet)
         {
             theResultSet = ((FilteringResultSet) results).getUnFilteredResultSet();
