@@ -1088,7 +1088,7 @@ public class SitesImpl implements Sites
             // explicitly force cleanup here
             siteServiceImpl.beforePurgeNode(siteNodeRef);
         }
-        
+
         siteService.deleteSite(siteId);
     }
 
