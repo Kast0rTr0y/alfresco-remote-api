@@ -1059,7 +1059,6 @@ public class SitesImpl implements Sites
     public void deleteSite(String siteId, Parameters parameters)
     {
         boolean isSiteAdmin = siteService.isSiteAdmin(AuthenticationUtil.getFullyAuthenticatedUser());
-
         SiteInfo siteInfo = validateSite(siteId);
         if (siteInfo == null)
         {
@@ -1089,23 +1088,8 @@ public class SitesImpl implements Sites
             // explicitly force cleanup here
             siteServiceImpl.beforePurgeNode(siteNodeRef);
         }
-
-        if (isSiteAdmin == true)
-        {
-            AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Void>()
-            {
-                public Void doWork() throws Exception
-                {
-                    // Delete the site
-                    siteService.deleteSite(siteInfo.getShortName());
-                    return null;
-                }
-            }, AuthenticationUtil.getAdminUserName());
-        }
-        else
-        {
-            siteService.deleteSite(siteId);
-        }
+        
+        siteService.deleteSite(siteId);
     }
 
     /**
